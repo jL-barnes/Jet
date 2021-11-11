@@ -1,0 +1,14 @@
+*.*~
+*.ipynb
+
+*.dat
+*.h5
+
+*.o
+*.dYSM
+jet
+
+../analyze/*
+../analyze
+Swapnil/*
+Swapnil
