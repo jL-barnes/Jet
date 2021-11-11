@@ -1,5 +1,7 @@
 *.*~
 *.ipynb
+*/ipyn_checkpoints/*
+read.me
 
 *.dat
 *.h5
@@ -9,6 +11,6 @@
 jet
 
 ../analyze/*
-../analyze
+../analyze/
 Swapnil/*
 Swapnil
