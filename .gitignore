@@ -1,8 +1,19 @@
+*.*~
+*.ipynb
+*/ipyn_checkpoints/*
+read.me
 
-jet
-*.o
 *.dat
 *.h5
 *.log
-abort
 
+*.o
+*.dYSM
+jet
+
+../analyze/*
+../analyze/
+Swapnil/*
+Swapnil
+
+abort
