@@ -104,10 +104,10 @@ void report( struct domain * theDomain , double t ){
    MPI_Allreduce( MPI_IN_PLACE , &MSum , 1 , MPI_DOUBLE , MPI_SUM , grid_comm );
    MPI_Allreduce( MPI_IN_PLACE , &Ni_direct   , 1 , MPI_DOUBLE , MPI_SUM , grid_comm );
    MPI_Allreduce( MPI_IN_PLACE , &Ni_viaPPP   , 1 , MPI_DOUBLE , MPI_SUM , grid_comm );
-   MPI_Allreduce( MPI_IN_PLACE , &rMin_Rel_N   , 1 , MPI_DOUBLE , MPI_MIN , grid_comm );
-   MPI_Allreduce( MPI_IN_PLACE , &rMax_Rel_N   , 1 , MPI_DOUBLE , MPI_MAX , grid_comm );
-   MPI_Allreduce( MPI_IN_PLACE , &rMin_Rel_S   , 1 , MPI_DOUBLE , MPI_MIN , grid_comm );
-   MPI_Allreduce( MPI_IN_PLACE , &rMax_Rel_S   , 1 , MPI_DOUBLE , MPI_MAX, grid_comm );
+   MPI_Allreduce( MPI_IN_PLACE , &rMin_rel_N   , 1 , MPI_DOUBLE , MPI_MIN , grid_comm );
+   MPI_Allreduce( MPI_IN_PLACE , &rMax_rel_N   , 1 , MPI_DOUBLE , MPI_MAX , grid_comm );
+   MPI_Allreduce( MPI_IN_PLACE , &rMin_rel_S   , 1 , MPI_DOUBLE , MPI_MIN , grid_comm );
+   MPI_Allreduce( MPI_IN_PLACE , &rMax_rel_S   , 1 , MPI_DOUBLE , MPI_MAX, grid_comm );
 
    double uAv = uSum/ESum;
    double sintj2 = ESum/sqrt( 4.*M_PI*I_th );
