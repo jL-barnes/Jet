@@ -61,11 +61,13 @@ void report( struct domain * theDomain , double t ){
 	 double gh = gam*h;
 	 if (gh >= ghth){ //relativistic flow
 	   double r = c->riph;
-	   if (t_jph[jk] <= M_PI/2.0){ // North pole
+	   if (t_jph[jk] <= M_PI/2.0){ // Northern hemisphere
 	     if (r < rMin_rel_N) rMin_rel_N = r;
 	     if (r > rMax_rel_N) rMax_rel_N = r;
 	   }
-	   else{ // South pole
+	   else{ // Southern hemisphere
+	     printf("in south (th = %.2f):\n", t_jph[jk] );
+	     printf( "r, rmin, rmax = %.3e %.3e %.3e\n", r, rMin_rel_S, rMax_rel_S );
 	     if (r < rMin_rel_S) rMin_rel_S = r;
 	     if (r > rMax_rel_S) rMax_rel_S = r;
 	   }
