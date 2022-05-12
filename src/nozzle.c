@@ -8,6 +8,7 @@ static double eta0;
 static double gam0;
 static double tjet;
 static double tmin;
+static int    wind;
 
 void setNozzleParams( struct domain * theDomain ){
 
@@ -18,17 +19,16 @@ void setNozzleParams( struct domain * theDomain ){
    gam0 = theDomain->theParList.Nozzle_Gamma;
    tjet = theDomain->theParList.Nozzle_Time;
    tmin = theDomain->theParList.t_min;
-
+   wind = theDomain->theParList.Nozzle_is_Wind;
 }
 
 void noz_src( double * cons , double dVdt , double r , double theta , double t , double r_min ){
 
    double r0,v,Vol,f,eta;
-   int wind = 0;
+   //   int wind = 0;
    if( !wind ){
 
      r0 = 5.*r_min;
-     // r0 = 5.*r_min;
      v = sqrt(1.-1./gam0/gam0);
 
      Vol = pow( sqrt(2.*M_PI)*r0 , 3. )*( 1. - exp(-2./th0/th0) )*th0*th0/sqrt(.5*M_PI);
@@ -51,7 +51,7 @@ void noz_src( double * cons , double dVdt , double r , double theta , double t ,
    double SM = SE/eta;
 
    cons[DEN] += SM*dVdt;
-   cons[SS1] += SS*dVdt;// *cos(theta);
+   cons[SS1] += SS*dVdt;// *cos(theta<);
    //cons[SS2] += SS*dVdt*sin(theta)*(-r);
    cons[TAU] += SE*dVdt;
 

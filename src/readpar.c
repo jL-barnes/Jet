@@ -100,6 +100,7 @@ int read_par_file( struct domain * theDomain ){
          err += readvar( pfile , "Nozzle_th0"        , VAR_DOUB , &(theList->Nozzle_th0)      );
          err += readvar( pfile , "Nozzle_Time"       , VAR_DOUB , &(theList->Nozzle_Time)     );
 	 err += readvar( pfile , "Nozzle_GammaH_thr" , VAR_DOUB , &(theList->gamH_rel_Th)     );
+	 err += readvar( pfile, "Nozzle_is_Wind"     , VAR_INT, &(theList->Nozzle_is_Wind)    );
          err += readvar( pfile , "Use_Logtime"       , VAR_INT  , &(theList->Out_LogTime)     );
          err += readvar( pfile , "Initial_Cons"      , VAR_INT  , &(theList->Initial_Cons)    );
          err += readvar( pfile , "Reset_Entropy"     , VAR_INT  , &(theList->Reset_Entropy)   );

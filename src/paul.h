@@ -40,7 +40,7 @@ struct param_list{
    int Gravity_Switch, Output_Mass;
    double PointMass;
 
-   int Nozzle_Switch;
+  int Nozzle_Switch, Nozzle_is_Wind;
    double Nozzle_Power, Nozzle_Gamma, Nozzle_Eta, Nozzle_r0, Nozzle_th0, Nozzle_Time;
   double gamH_rel_Th;
 
