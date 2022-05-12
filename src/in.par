@@ -13,8 +13,8 @@ Num_Checkpoints		60 //300 //1000
 Use_Logtime		1
 
 //Grid Dimensions//
-Num_R			64 //3200
-Num_Theta		64 //32
+Num_R			50 //3200
+Num_Theta		50 //32
 Num_Phi			1
 
 //Domain Parameters//
@@ -42,8 +42,8 @@ PLM			1.0
 Density_Floor		0.0
 Pressure_Floor		1e-8
 Reset_Entropy		0
-Make_Nickel		1
-P56_critical            485.0 // critical pressure for Nickel production
+Make_Nickel		0
+P56_critical 		485.0
 Add_Cooling		0
 
 
@@ -56,17 +56,17 @@ PointMass		0
 Output_Mass		0
 
 //Nozzle Parameters
-Nozzle_Switch		1
-Nozzle_Power		0.0136 //1e-4 //0.03 //6e-4 //2.5e-4//0.3
+Nozzle_Switch		0
+Nozzle_Power 		0.0136
 Nozzle_Gamma		50.0
 Nozzle_Eta		1000.0
 Nozzle_r0		1e-3
-Nozzle_th0		0.2
-Nozzle_Time		0.296 //0.03 //1.0
+Nozzle_th0 		 0.2
+Nozzle_Time 		 0.21544346900318834
 Nozzle_GammaH_thr       10.0
 
 //Initial Parameters
-Explosion_Energy	0.0
+Explosion_Energy	0.01
 Gam_0			1e-16
 Gam_Boost		0.0
 
