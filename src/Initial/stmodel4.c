@@ -46,7 +46,7 @@ void initial( double * prim , double * x ){
    prim[UU1] = 0.0;
    prim[UU2] = 0.0;
 
-   // first passive scalar is the maximum Pressure
+   // first passive scalar is the maximum Pressure (SNe)
    if( NUM_N > 0 ) prim[NUM_C] = 0.0;
    // second passive scalar is the initial mass coordinate
    if( NUM_N > 1 ){
@@ -54,10 +54,13 @@ void initial( double * prim , double * x ){
       double X = mass_appx( r , rin );
       prim[NUM_C+1] = X;
    }
-   // third passive scalar is the Ni-56 mass fraction 
+   // third (fourth) passive scalar is the Ni-56 (wind) mass fraction 
    // (calculated according to the input pressure threshold)
    if( NUM_N > 2 ){
-      prim[NUM_C+2] = 0.0;
+     prim[NUM_C+2] = 0.0;
+   }
+   if( NUM_N > 3 ){
+     prim[NUM_C+3] = 0.0;
    }
 
 }

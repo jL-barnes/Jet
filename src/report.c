@@ -11,6 +11,8 @@ void report( struct domain * theDomain , double t ){
    double * t_jph = theDomain->t_jph;
    double Pth = theDomain->theParList.P56_critical;
    double ghth = theDomain->theParList.gamH_rel_Th;
+   int wind = theDomain->theParList.Nozzle_is_Wind;
+   int make_nick = theDomain->theParList.Make_Nickel;
 
 
    int jmin = Ng;
@@ -27,8 +29,9 @@ void report( struct domain * theDomain , double t ){
    double EJet = 0.0;
    double XSum = 0.0;
    double MSum = 0.0;
-   double Ni_direct   = 0.0;
+   double Ni_direct = 0.0;
    double Ni_viaPPP = 0.0;
+   double Wind_Mass = 0.0;
    double uMax = 0.0;
    double gh_max = 0.0;
    double rMax = 0.0;
@@ -47,12 +50,22 @@ void report( struct domain * theDomain , double t ){
          struct cell * c = &(theCells[jk][i]);
          double ur = c->prim[UU1];
          double up = c->prim[UU2];
-         double X = 0.0; // X56 calculated with method 1
-	 double XP = 0.0; // max pressure for calculation
+         double X = 0.0; 
+	 // if we're injecting a jet and tracking 56-Ni production, X is the the
+	 // nickel mass fraction, calculated via a temperature threshold
+	 double XP = 0.0; 
+	 // max pressure for calculation (only relevant if we're making nickel)
 	 // currently, the third passive scalar is the one
 	 // that tracks nickel mass fraction
-	 if( NUM_Q > NUM_C ) XP = c->prim[NUM_C];  
-	 if( NUM_Q > NUM_C+2 ) X = c->prim[NUM_C+2];
+	 double Xw = 0.0;
+	 // if we're injecting a wind, the wind mass fraction
+	 if( make_nick ){
+	   if( NUM_Q > NUM_C ) XP = c->prim[NUM_C];  
+	   if( NUM_Q > NUM_C+2 ) X = c->prim[NUM_C+2]; }
+	 if( wind ){
+	   if( NUM_Q > NUM_C+3 ) Xw = c->prim[NUM_C+3]; 
+	 }
+
          double u = sqrt(ur*ur+up*up);
          double E = c->cons[TAU];
          double M = c->cons[DEN];
@@ -66,8 +79,8 @@ void report( struct domain * theDomain , double t ){
 	     if (r > rMax_rel_N) rMax_rel_N = r;
 	   }
 	   else{ // Southern hemisphere
-	     printf("in south (th = %.2f):\n", t_jph[jk] );
-	     printf( "r, rmin, rmax = %.3e %.3e %.3e\n", r, rMin_rel_S, rMax_rel_S );
+	     //printf("in south (th = %.2f):\n", t_jph[jk] );
+	     //printf( "r, rmin, rmax = %.3e %.3e %.3e\n", r, rMin_rel_S, rMax_rel_S );
 	     if (r < rMin_rel_S) rMin_rel_S = r;
 	     if (r > rMax_rel_S) rMax_rel_S = r;
 	   }
@@ -86,6 +99,7 @@ void report( struct domain * theDomain , double t ){
          //Ni += X*M;
 	 if( XP > Pth ) Ni_viaPPP += M;
 	 Ni_direct += M*X;
+	 Wind_Mass += M*Xw;
          if( uMax < u ) uMax = u;
          if( gh_max < gam*h ) gh_max = gam*h;
       }
@@ -104,6 +118,7 @@ void report( struct domain * theDomain , double t ){
    MPI_Allreduce( MPI_IN_PLACE , &MSum , 1 , MPI_DOUBLE , MPI_SUM , grid_comm );
    MPI_Allreduce( MPI_IN_PLACE , &Ni_direct   , 1 , MPI_DOUBLE , MPI_SUM , grid_comm );
    MPI_Allreduce( MPI_IN_PLACE , &Ni_viaPPP   , 1 , MPI_DOUBLE , MPI_SUM , grid_comm );
+   MPI_Allreduce( MPI_IN_PLACE , &Wind_Mass   , 1 , MPI_DOUBLE , MPI_SUM , grid_comm );
    MPI_Allreduce( MPI_IN_PLACE , &rMin_rel_N   , 1 , MPI_DOUBLE , MPI_MIN , grid_comm );
    MPI_Allreduce( MPI_IN_PLACE , &rMax_rel_N   , 1 , MPI_DOUBLE , MPI_MAX , grid_comm );
    MPI_Allreduce( MPI_IN_PLACE , &rMin_rel_S   , 1 , MPI_DOUBLE , MPI_MIN , grid_comm );
@@ -149,10 +164,21 @@ void report( struct domain * theDomain , double t ){
 
    if( rank==0 ){
       FILE * rFile = fopen("report.dat","a");
-      if ( theDomain->count_steps == 0 ){
-	fprintf( rFile, "# time R_forward_shock Rmin uAverage uMax E_total M_total E_jet_rel gamma_h_max Rmin_ghRel_N Rmax_ghRel_N Rmin_ghRel_S Rmax_ghRel_S v_photosphere M_Ni56_direct M_Ni56_PPP sint_jet_2 E_therm_tot\n" ); }
-      fprintf(rFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",t,rMax,rMin,uAv,uMax,ESum,MSum,EJet,gh_max,rMin_rel_N,rMax_rel_N,rMin_rel_S,rMax_rel_S,v_phot,Ni_direct, Ni_viaPPP,sintj2,ETherm);
-      //fprintf(rFile,"%e %e %e %e %e\n",t,uSum,ESum,uXSum,EXSum);
+      if( make_nick && !wind ){
+	if ( theDomain->count_steps == 0 ){
+	  fprintf( rFile, "# time R_forward_shock Rmin uAverage uMax E_total M_total E_jet_rel gamma_h_max Rmin_ghRel_N Rmax_ghRel_N Rmin_ghRel_S Rmax_ghRel_S v_photosphere M_Ni56_direct M_Ni56_PPP sint_jet_2 E_therm_tot\n" ); }
+	fprintf(rFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",t,rMax,rMin,uAv,uMax,ESum,MSum,EJet,gh_max,rMin_rel_N,rMax_rel_N,rMin_rel_S,rMax_rel_S,v_phot,Ni_direct, Ni_viaPPP,sintj2,ETherm);
+      }
+      else if( make_nick && wind ){
+	if ( theDomain->count_steps == 0 ){
+	  fprintf( rFile, "# time R_forward_shock Rmin uAverage uMax E_total M_total E_jet_rel gamma_h_max Rmin_ghRel_N Rmax_ghRel_N Rmin_ghRel_S Rmax_ghRel_S v_photosphere M_wind M_Ni56_directM_Ni56_PPP sint_jet_2 E_therm_tot\n" ); }
+	fprintf(rFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",t,rMax,rMin,uAv,uMax,ESum,MSum,EJet,gh_max,rMin_rel_N,rMax_rel_N,rMin_rel_S,rMax_rel_S,v_phot, Wind_Mass, Ni_direct, Ni_viaPPP,sintj2,ETherm);
+      }
+      if( !make_nick && wind ){
+	if ( theDomain->count_steps == 0 ){
+	  fprintf( rFile, "# time R_forward_shock Rmin uAverage uMax E_total M_total E_jet_rel gamma_h_max Rmin_ghRel_N Rmax_ghRel_N Rmin_ghRel_S Rmax_ghRel_S v_photosphere M_wind sint_jet_2 E_therm_tot\n" ); }
+	fprintf(rFile,"%e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e %e\n",t,rMax,rMin,uAv,uMax,ESum,MSum,EJet,gh_max,rMin_rel_N,rMax_rel_N,rMin_rel_S,rMax_rel_S,v_phot, Wind_Mass ,sintj2,ETherm);
+      }
       fclose(rFile);
    }
 

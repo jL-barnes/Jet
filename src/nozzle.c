@@ -1,30 +1,39 @@
-
 #include "paul.h"
 
 //static double r0;
-static double Pow;
+static double noz_pow;
 static double th0;
 static double eta0;
 static double gam0;
 static double tjet;
 static double tmin;
 static int    wind;
+static double beta0;
+static double m_wind;
+static double wind_pow;
 
 void setNozzleParams( struct domain * theDomain ){
 
+
 //   r0   = theDomain->theParList.Nozzle_r0;
-   Pow  = theDomain->theParList.Nozzle_Power;
+   noz_pow  = theDomain->theParList.Nozzle_Power;
    th0  = theDomain->theParList.Nozzle_th0; 
    eta0 = theDomain->theParList.Nozzle_Eta;
    gam0 = theDomain->theParList.Nozzle_Gamma;
    tjet = theDomain->theParList.Nozzle_Time;
    tmin = theDomain->theParList.t_min;
    wind = theDomain->theParList.Nozzle_is_Wind;
+   if( wind ){
+     beta0 = theDomain->theParList.Wind_Nozzle_Beta;
+     m_wind = theDomain->theParList.Wind_Mass;
+     wind_pow = 0.5 * m_wind * beta0*beta0;
+   }
 }
 
 void noz_src( double * cons , double dVdt , double r , double theta , double t , double r_min ){
 
    double r0,v,Vol,f,eta;
+   double time_factor,Pow;
    //   int wind = 0;
    if( !wind ){
 
@@ -35,25 +44,40 @@ void noz_src( double * cons , double dVdt , double r , double theta , double t ,
      f = (r/r0)*exp(-.5*r*r/r0/r0)*exp( (fabs(cos(theta))-1.) /th0/th0)/Vol;
      eta = eta0;
      f *= exp(-(t-tmin)/tjet);
+     Pow = noz_pow;
    }else{
-   
+     // wind!
       r0 = 2.*r_min;
-      v = 0.1;
+      v = beta0;
       Vol = 8.*M_PI*pow( r0 , 3. );
       f = (r/r0)*exp(-.5*r*r/r0/r0)/Vol;
+      time_factor = exp( -(t-tmin) );
+      f *= time_factor;
       eta = .5*v*v;
+      Pow = wind_pow;
    }
    //   f *= pow(1.+(t-tmin)/tjet,-2.);
 
 
    double SE = Pow*f;
-   double SS = v*SE;
    double SM = SE/eta;
+   // value of SS depends on whether we're using relativistic or non-relativistic hydro
+   double SS = v*SE;
 
    cons[DEN] += SM*dVdt;
    cons[SS1] += SS*dVdt;// *cos(theta<);
+   // adding this in....
+   cons[SS2] += 0.0;
    //cons[SS2] += SS*dVdt*sin(theta)*(-r);
    cons[TAU] += SE*dVdt;
+
+   // try adding a passive scaler for the wind here
+   if( wind ){
+     if( NUM_N > 3 ){
+       cons[NUM_C+3] += SM*dVdt;
+       // cons2prim should take care of setting the primitive analog
+     }
+   }
 
    //   if( NUM_N > 0 ){
    //   cons[NUM_C+0] += SM*dVdt;
@@ -127,7 +151,7 @@ void noz_set( double * prim , double r , double theta , double t , double r_min 
 
          double Area = 2.*M_PI*r0*r0*(1.-cos(th0));
 
-         Pp  = Pow/4./gam0/gam0/Area*exp(-t/tjet);
+         Pp  = noz_pow/4./gam0/gam0/Area*exp(-t/tjet);
          rho = 4.*gam0*Pp/eta0;
          gv  = gam0;
          X   = 1.0;

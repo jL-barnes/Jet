@@ -12,9 +12,11 @@ enum{C_FIXED,C_WRIEMANN,C_WCELL};
 #define MOVE_CELLS C_WCELL
 
 #define NUM_C 4 // in two dimensions, you only use 2 velocity/momentum coordinates
-#define NUM_N 3 // number of extra things you're keeping track of
-// We have three passive scalars: max pressure, initial mass coordinate,
+#define NUM_N 4 // number of extra things you're keeping track of
+// For the jet-drive sne: We have three passive scalars: max pressure, initial mass coordinate,
 // and X56 (calculated in situ based on pressure thresholds)
+// For collapsar mixing: we have only one (whether or not it's a wind) and I'm giving that it's own index,
+// rather than reusing the collapsar model
 #define NUM_Q (NUM_C+NUM_N)
 #define NUM_G 2
 
@@ -43,6 +45,8 @@ struct param_list{
   int Nozzle_Switch, Nozzle_is_Wind;
    double Nozzle_Power, Nozzle_Gamma, Nozzle_Eta, Nozzle_r0, Nozzle_th0, Nozzle_Time;
   double gamH_rel_Th;
+
+  double Wind_Nozzle_Beta, Wind_Mass;
 
    double Explosion_Energy,Gam_0,Gam_Boost;
 
