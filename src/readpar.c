@@ -103,6 +103,9 @@ int read_par_file( struct domain * theDomain ){
 	 err += readvar( pfile, "Nozzle_is_Wind"     , VAR_INT  , &(theList->Nozzle_is_Wind)  );
          err += readvar( pfile, "Wind_Mass"          , VAR_DOUB , &(theList->Wind_Mass)       );
          err += readvar( pfile, "Wind_Nozzle_Beta"   , VAR_DOUB , &(theList->Wind_Nozzle_Beta));
+         err += readvar( pfile, "Wind_t0         "   , VAR_DOUB , &(theList->Wind_t0)         );
+         err += readvar( pfile, "Wind_dt"            , VAR_DOUB , &(theList->Wind_dt)         );
+         err += readvar( pfile, "Start_Wind_tmin"    , VAR_INT ,  &(theList->Start_Wind_tmin) );
 	 err += readvar( pfile , "Use_Logtime"       , VAR_INT  , &(theList->Out_LogTime)     );
          err += readvar( pfile , "Initial_Cons"      , VAR_INT  , &(theList->Initial_Cons)    );
          err += readvar( pfile , "Reset_Entropy"     , VAR_INT  , &(theList->Reset_Entropy)   );

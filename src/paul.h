@@ -46,7 +46,8 @@ struct param_list{
    double Nozzle_Power, Nozzle_Gamma, Nozzle_Eta, Nozzle_r0, Nozzle_th0, Nozzle_Time;
   double gamH_rel_Th;
 
-  double Wind_Nozzle_Beta, Wind_Mass;
+  double Wind_Nozzle_Beta, Wind_Mass, Wind_t0, Wind_dt;
+  int Start_Wind_tmin;
 
    double Explosion_Energy,Gam_0,Gam_Boost;
 

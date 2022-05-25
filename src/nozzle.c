@@ -8,9 +8,12 @@ static double gam0;
 static double tjet;
 static double tmin;
 static int    wind;
+static double t0_wind;
 static double beta0;
 static double m_wind;
 static double wind_pow;
+static double tau_wind;
+static int start_at_tmin;
 
 void setNozzleParams( struct domain * theDomain ){
 
@@ -26,7 +29,11 @@ void setNozzleParams( struct domain * theDomain ){
    if( wind ){
      beta0 = theDomain->theParList.Wind_Nozzle_Beta;
      m_wind = theDomain->theParList.Wind_Mass;
-     wind_pow = 0.5 * m_wind * beta0*beta0;
+     t0_wind = theDomain->theParList.Wind_t0;
+     start_at_tmin = theDomain->theParList.Start_Wind_tmin;
+     if( start_at_tmin ) t0_wind = tmin;
+     tau_wind = theDomain->theParList.Wind_dt;
+     wind_pow = 0.5 * m_wind/tau_wind * beta0*beta0;
    }
 }
 
@@ -34,6 +41,7 @@ void noz_src( double * cons , double dVdt , double r , double theta , double t ,
 
    double r0,v,Vol,f,eta;
    double time_factor,Pow;
+   double Mdot_wind;
    //   int wind = 0;
    if( !wind ){
 
@@ -51,7 +59,7 @@ void noz_src( double * cons , double dVdt , double r , double theta , double t ,
       v = beta0;
       Vol = 8.*M_PI*pow( r0 , 3. );
       f = (r/r0)*exp(-.5*r*r/r0/r0)/Vol;
-      time_factor = exp( -(t-tmin) );
+      time_factor = exp( -(t-t0_wind) );
       f *= time_factor;
       eta = .5*v*v;
       Pow = wind_pow;
