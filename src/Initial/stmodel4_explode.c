@@ -48,6 +48,10 @@ void initial( double * prim , double * x ){
    double Px = (GAMMA_LAW - 1.0) * Explosion_Energy * exp( -r*r/r0/r0 );
    Px /= pow( sqrt(M_PI)*r0, 3 );
 
+   if( Explosion_Energy < 1e-8 ){
+     if( Pp > 1.0 * M0/R0/R0/R0 ) Pp = 1.0 * M0/R0/R0/R0;
+   }
+
    prim[RHO] = rho;
    prim[PPP] = Pp + Px;
    prim[UU1] = 0.0;

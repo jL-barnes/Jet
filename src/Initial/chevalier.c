@@ -1,4 +1,3 @@
-
 #include "../paul.h"
 
 static double T_MIN = 0.0; 
